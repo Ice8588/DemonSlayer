@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerCtrl : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    public float moveSpeed = 10f;
     public float mouseSensitivity = 2f;
     public Transform playerCamera;
     private CharacterController controller;
@@ -25,6 +25,9 @@ public class PlayerCtrl : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        if (Input.GetMouseButton(1))
+            mouseX = 0;
 
         transform.Rotate(Vector3.up * mouseX);
 
