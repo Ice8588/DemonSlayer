@@ -20,6 +20,17 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+
+        Vector3 pos = weaponTransform.position;
+
+        // X 軸（紅色）
+        Debug.DrawRay(pos, weaponTransform.right * 0.5f, Color.red);
+
+        // Y 軸（綠色）
+        Debug.DrawRay(pos, weaponTransform.up * 0.5f, Color.green);
+
+        // Z 軸（藍色）
+        Debug.DrawRay(pos, weaponTransform.forward * 0.5f, Color.blue);
         if (Input.GetMouseButton(1))
         {
             ChangeRotation();
@@ -49,14 +60,11 @@ public class PlayerAttack : MonoBehaviour
 
     IEnumerator SwingAnimation()
     {
-        float z = weaponTransform.localEulerAngles.z;
-        if (z > 180f) z -= 360f;  // 將角度統一到 -180 ~ 180 範圍
-
-        int swingAngle = (z >= 0) ? 60 : -60;
+        int swingAngle = 60;
 
         Quaternion startRot = weaponTransform.localRotation;
         Quaternion swingRot = Quaternion.AngleAxis(swingAngle, Vector3.right);
-        Quaternion targetRot = swingRot * startRot;
+        Quaternion targetRot = startRot * swingRot;
 
         float t = 0f;
         while (t < 0.3f)
