@@ -8,7 +8,7 @@ public class PlayerAttack : MonoBehaviour
     public Collider weaponCollider;
     //public Animator animator;
     private float rotationSpeed = 360f;
-    public float attackDuration = 0.5f;
+    public float attackDuration = 0.8f;
     private float weaponAngle = 0f;
     private bool isAttacking = false;
 
