@@ -27,11 +27,11 @@ public class PlayerCtrl : MonoBehaviour
         float arrowX = 0;
         float arrowY = 0;
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
         {
             arrowX = 1;
         }
-        else if (Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
         {
             arrowX = -1;
         }

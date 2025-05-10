@@ -7,9 +7,8 @@ public class PlayerAttack : MonoBehaviour
     public Transform weaponTransform;
     public Collider weaponCollider;
     //public Animator animator;
-    private float rotationSpeed = 360f;
-    public float attackDuration = 0.8f;
-    private float weaponAngle = 0f;
+    private float rotationSpeed = 180f;
+    private float attackDuration = 0.8f;
     private bool isAttacking = false;
 
     void Start()
@@ -20,23 +19,12 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-
-        Vector3 pos = weaponTransform.position;
-
-        // X 軸（紅色）
-        Debug.DrawRay(pos, weaponTransform.right * 0.5f, Color.red);
-
-        // Y 軸（綠色）
-        Debug.DrawRay(pos, weaponTransform.up * 0.5f, Color.green);
-
-        // Z 軸（藍色）
-        Debug.DrawRay(pos, weaponTransform.forward * 0.5f, Color.blue);
-        if (Input.GetMouseButton(1))
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
             ChangeRotation();
         }
 
-        if (Input.GetMouseButtonDown(0) && !isAttacking)
+        if ((Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0)) && !isAttacking)
         {
             Attack();
         }
@@ -44,7 +32,14 @@ public class PlayerAttack : MonoBehaviour
 
     void ChangeRotation()
     {
-        weaponTransform.Rotate(Vector3.forward, Input.GetAxis("Mouse X") * -rotationSpeed * Time.deltaTime, Space.Self);
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            weaponTransform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime, Space.Self);
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            weaponTransform.Rotate(Vector3.forward, -rotationSpeed * Time.deltaTime, Space.Self);
+        }
     }
 
     void Attack()
@@ -60,7 +55,7 @@ public class PlayerAttack : MonoBehaviour
 
     IEnumerator SwingAnimation()
     {
-        int swingAngle = 60;
+        int swingAngle = 120;
 
         Quaternion startRot = weaponTransform.localRotation;
         Quaternion swingRot = Quaternion.AngleAxis(swingAngle, Vector3.right);
