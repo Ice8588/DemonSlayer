@@ -18,64 +18,40 @@ public class PlayerCtrl : MonoBehaviour
 
     void Update()
     {
-        CameraMove();
-        PlayerMove();
+        /*
+        CameraMoveX();
+        CameraMoveY();
+        PlayerMoveH();
+        PlayerMoveV();
+        */
     }
 
-    void CameraMove()
+    public void CameraMoveX(int direction = 0) //-1 = left, 0 = none, 1 = right
     {
-        float arrowX = 0;
-        float arrowY = 0;
+        float arrowX = direction;
+        transform.Rotate(arrowX * cameraMoveSpeed * Vector3.up);
+    }
 
-        if (Input.GetKey(KeyCode.RightArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-        {
-            arrowX = 1;
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-        {
-            arrowX = -1;
-        }
-
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            arrowY = 1;
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            arrowY = -1;
-        }
-
-        transform.Rotate(Vector3.up * arrowX * cameraMoveSpeed);
+    public void CameraMoveY(int direction = 0) //-1 = down, 0 = none, 1 = up
+    {
+        float arrowY = direction;
 
         cameraPitch -= arrowY * cameraMoveSpeed;
         cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
         playerCamera.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
     }
 
-    void PlayerMove()
+    public void PlayerMoveH(int direction = 0) //-1 = left, 0 = none, 1 = right
     {
-        float h = 0;
-        float v = 0;
+        float h = direction;
+        Vector3 move = transform.right * h;
+        controller.Move(move * moveSpeed * Time.deltaTime);
+    }
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            v = 1;
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            v = -1;
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            h = -1;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            h = 1;
-        }
-
-        Vector3 move = transform.right * h + transform.forward * v;
+    public void PlayerMoveV(int direction = 0) //-1 = back, 0 = none, 1 = forward
+    {
+        float v = direction;
+        Vector3 move = transform.forward * v;
         controller.Move(move * moveSpeed * Time.deltaTime);
     }
 

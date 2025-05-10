@@ -19,6 +19,7 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
+        /*
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
             ChangeRotation();
@@ -28,9 +29,10 @@ public class PlayerAttack : MonoBehaviour
         {
             Attack();
         }
+        */
     }
 
-    void ChangeRotation()
+    public void ChangeRotation(int direction = 0)//-1 = left, 0 = none, 1 = right
     {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
@@ -42,8 +44,13 @@ public class PlayerAttack : MonoBehaviour
         }
     }
 
-    void Attack()
+    public void Attack()
     {
+        if (isAttacking)
+        {
+            return;
+        }
+
         isAttacking = true;
         //animator.SetTrigger("Attack");
 
