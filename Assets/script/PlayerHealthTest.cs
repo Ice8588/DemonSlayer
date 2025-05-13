@@ -18,6 +18,7 @@ public class PlayerHealthTest : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             currentHP -= 10;
+            currentHP = Mathf.Max(currentHP, 0);
             healthBar.SetHealth(currentHP);
         }
     }
