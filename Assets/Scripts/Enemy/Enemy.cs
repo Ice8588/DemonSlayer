@@ -4,21 +4,22 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// 敵人的主要行為控制器
-/// 處理生命值、攻擊模式和方向系統
+/// 敵人的主要協調器，管理生命值並與其他組件（如移動和攻擊）交互。
 /// </summary>
-public class Enemy : MonoBehaviour, IDirectionProvider
+public class Enemy : MonoBehaviour
 {
     #region Components
     [Header("Components")]
     public Rigidbody rigidbody;
-    private EnemyMovement movement;
+    private EnemyMovement movementController;
+    private EnemyAttack attackController;
+    // IDirectionProvider 現在由 EnemyAttack 實現
     #endregion
 
     #region Stats Settings
     [Header("Stats Settings")]
     [SerializeField]
-    private float strength = 1.0f;
+    private float strength = 1.0f; // 敵人強度，影響攻擊模式的複雜度
 
     [SerializeField]
     private float maxHealth = 100f;
@@ -27,52 +28,20 @@ public class Enemy : MonoBehaviour, IDirectionProvider
     private float currentHealth;
 
     [SerializeField]
-    private float weakPointDamage = 20f;
-    #endregion
-
-    #region Attack Settings
-    [Header("Attack Settings")]
-    [SerializeField]
-    private float patternUpdateInterval = 2.0f;
-
-    [SerializeField]
-    private float baseAttackProbability = 0.4f;
-
-    [SerializeField]
-    private float attackDamage = 20f;
-
-    [SerializeField]
-    private float attackDelay = 1.0f;
+    private float weakPointReceivedDamage = 20f; // 弱點被擊中時受到的傷害
     #endregion
 
     #region Events
     [Header("Events")]
     public UnityEvent onDeath;
-    public UnityEvent<float> onHealthChanged;
-    public UnityEvent onWeakPointHit;
-    public UnityEvent onAttackBlocked;
-    public UnityEvent onAttackStart;
-    public UnityEvent<float> onPlayerDamaged;
-    #endregion
-
-    #region Private Fields
-    private float nextUpdateTime = 0f;
-    private int currentAttackIndex = -1;
-    private bool isAttacking = false;
-    
-    [SerializeField]
-    private DirectionType[] directions = new DirectionType[8];
+    public UnityEvent<float> onHealthChanged; // 參數是健康百分比 (0-1)
+    // 注意：攻擊相關的事件現在由 EnemyAttack 處理
     #endregion
 
     #region Unity Lifecycle
-    private void Start()
+    private void Awake()
     {
         InitializeEnemy();
-    }
-
-    private void Update()
-    {
-        UpdateAttackPattern();
     }
     #endregion
 
@@ -80,118 +49,17 @@ public class Enemy : MonoBehaviour, IDirectionProvider
     private void InitializeEnemy()
     {
         currentHealth = maxHealth;
-        movement = GetComponent<EnemyMovement>();
-        if (movement == null)
+        movementController = GetComponent<EnemyMovement>();
+        if (movementController == null)
         {
-            movement = gameObject.AddComponent<EnemyMovement>();
-        }
-        UpdateDirections();
-    }
-    #endregion
-
-    #region Direction Management
-    private void UpdateDirections()
-    {
-        ResetAttackState();
-        ResetDirections();
-        GenerateAttackPoint();
-        GenerateWeakPoints();
-    }
-
-    private void ResetDirections()
-    {
-        for (int i = 0; i < directions.Length; i++)
-        {
-            directions[i] = DirectionType.None;
-        }
-    }
-
-    private void ResetAttackState()
-    {
-        StopAllCoroutines();
-        isAttacking = false;
-        currentAttackIndex = -1;
-    }
-
-    private void GenerateAttackPoint()
-    {
-        float currentAttackProbability = CalculateAttackProbability();
-        if (Random.value < currentAttackProbability)
-        {
-            int attackIndex = Random.Range(0, 8);
-            directions[attackIndex] = DirectionType.AttackPoint;
-            currentAttackIndex = attackIndex;
-            StartCoroutine(AttackCoroutine(attackIndex));
-        }
-    }
-
-    private float CalculateAttackProbability()
-    {
-        float probability = baseAttackProbability + (strength * 0.1f);
-        return Mathf.Clamp01(probability);
-    }
-
-    private void GenerateWeakPoints()
-    {
-        int weakPointCount = CalculateWeakPointCount();
-        for (int i = 0; i < weakPointCount; i++)
-        {
-            GenerateSingleWeakPoint();
-        }
-    }
-
-    private int CalculateWeakPointCount()
-    {
-        float pointMultiplier = 1.0f / strength;
-        int weakPoints = Mathf.CeilToInt(3 * pointMultiplier);
-        return Mathf.Clamp(weakPoints, 0, 3);
-    }
-
-    private void GenerateSingleWeakPoint()
-    {
-        int randomIndex;
-        do
-        {
-            randomIndex = Random.Range(0, 8);
-        } while (directions[randomIndex] != DirectionType.None);
-        directions[randomIndex] = DirectionType.WeakPoint;
-    }
-    #endregion
-
-    #region Attack System
-    private void UpdateAttackPattern()
-    {
-        if (Time.time >= nextUpdateTime)
-        {
-            UpdateDirections();
-            nextUpdateTime = Time.time + patternUpdateInterval;
-        }
-    }
-
-    private IEnumerator AttackCoroutine(int attackIndex)
-    {
-        isAttacking = true;
-        onAttackStart?.Invoke();
-
-        // 攻擊時暫時停止移動
-        movement.StopMovement();
-
-        yield return new WaitForSeconds(attackDelay);
-
-        if (isAttacking && directions[attackIndex] == DirectionType.AttackPoint)
-        {
-            DamagePlayer();
+            movementController = gameObject.AddComponent<EnemyMovement>();
         }
 
-        // 攻擊結束後恢復移動
-        movement.ResumeMovement();
-        ResetAttackState();
-    }
-
-    private void DamagePlayer()
-    {
-        onPlayerDamaged?.Invoke(attackDamage);
-        Debug.Log($"Player takes {attackDamage} damage!");
+        attackController = GetComponent<EnemyAttack>();
+        if (attackController == null)
+        {
+            attackController = gameObject.AddComponent<EnemyAttack>();
+        }
     }
     #endregion
 
@@ -210,67 +78,18 @@ public class Enemy : MonoBehaviour, IDirectionProvider
 
     private void Die()
     {
-        movement.StopMovement();
+        movementController?.StopMovement();
+        // 如果攻擊控制器也需要停止某些行為，可以在此處調用
+        // attackController?.StopAttack(); 
         onDeath?.Invoke();
         Destroy(gameObject);
     }
     #endregion
 
-    #region Public Interface
-    public DirectionType GetDirectionType(int directionIndex)
+    #region Public Interface for Stats and State
+    public float GetStrength()
     {
-        if (directionIndex >= 0 && directionIndex < directions.Length)
-        {
-            return directions[directionIndex];
-        }
-        return DirectionType.None;
-    }
-
-    public DirectionType[] GetAllDirectionTypes()
-    {
-        return directions;
-    }
-
-    public bool InteractWithDirection(int directionIndex)
-    {
-        if (directionIndex < 0 || directionIndex >= directions.Length)
-        {
-            return false;
-        }
-
-        DirectionType type = directions[directionIndex];
-        
-        switch (type)
-        {
-            case DirectionType.AttackPoint:
-                if (isAttacking && directionIndex == currentAttackIndex)
-                {
-                    OnAttackBlocked();
-                    return true;
-                }
-                return false;
-
-            case DirectionType.WeakPoint:
-                OnWeakPointHit();
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private void OnAttackBlocked()
-    {
-        ResetAttackState();
-        onAttackBlocked?.Invoke();
-        Debug.Log("Attack blocked!");
-    }
-
-    private void OnWeakPointHit()
-    {
-        TakeDamage(weakPointDamage);
-        onWeakPointHit?.Invoke();
-        Debug.Log($"Weak point hit! Damage: {weakPointDamage}");
+        return strength;
     }
 
     public float GetHealthPercentage()
@@ -291,6 +110,47 @@ public class Enemy : MonoBehaviour, IDirectionProvider
     public Vector3 GetPosition()
     {
         return transform.position;
+    }
+
+    /// <summary>
+    /// 由 EnemyAttack 調用，當敵人的弱點被擊中時。
+    /// </summary>
+    public void RegisterWeakPointHit()
+    {
+        TakeDamage(weakPointReceivedDamage);
+    }
+
+    /// <summary>
+    /// 外部系統（例如玩家的攻擊腳本）應調用此方法與敵人的方向系統交互。
+    /// </summary>
+    public bool InteractWithDirection(int directionIndex)
+    {
+        if (attackController != null)
+        {
+            return attackController.InteractWithDirection(directionIndex);
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 獲取方向類型，主要供GUI或其他需要顯示敵人狀態的系統使用。
+    /// </summary>
+    public DirectionType GetDirectionType(int directionIndex)
+    {
+        if (attackController != null)
+        {
+            return attackController.GetDirectionType(directionIndex);
+        }
+        return DirectionType.None;
+    }
+
+    public DirectionType[] GetAllDirectionTypes()
+    {
+        if (attackController != null)
+        {
+            return attackController.GetAllDirectionTypes();
+        }
+        return new DirectionType[8]; // 返回空數組或默認值
     }
     #endregion
 }
