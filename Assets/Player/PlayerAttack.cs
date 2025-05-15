@@ -10,6 +10,7 @@ public class PlayerAttack : MonoBehaviour
     private float rotationSpeed = 180f;
     private float attackDuration = 0.8f;
     private bool isAttacking = false;
+    private bool isRotating = false;
 
     void Start()
     {
@@ -32,16 +33,38 @@ public class PlayerAttack : MonoBehaviour
         */
     }
 
-    public void ChangeRotation(int direction = 0)//-1 = left, 0 = none, 1 = right
+    public void RotateWeapon(float startAngle, float endAngle)
     {
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (isRotating)
         {
-            weaponTransform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime, Space.Self);
+            return;
         }
-        else if (Input.GetKey(KeyCode.RightArrow))
+
+        isRotating = true;
+        StartCoroutine(SwingAnimation(startAngle, endAngle));
+        isRotating = false;
+    }
+
+    private IEnumerator SwingAnimation(float startAngle, float endAngle)
+    {
+        float elapsedTime = 0f;
+        float duration = 0.01f;
+        Quaternion startRotation = Quaternion.Euler(0f, 0f, startAngle);
+        Quaternion endRotation = Quaternion.Euler(0f, 0f, endAngle);
+
+        while (elapsedTime < duration)
         {
-            weaponTransform.Rotate(Vector3.forward, -rotationSpeed * Time.deltaTime, Space.Self);
+            elapsedTime += Time.deltaTime;
+            weaponTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, elapsedTime / duration);
+            yield return null;
         }
+
+        weaponTransform.localRotation = endRotation;
+    }
+
+    public float GetWeaponAngle()
+    {
+        return weaponTransform.localEulerAngles.z;
     }
 
     public void Attack()
@@ -53,8 +76,6 @@ public class PlayerAttack : MonoBehaviour
 
         isAttacking = true;
         //animator.SetTrigger("Attack");
-
-        //weaponCollider.enabled = true;
 
         StartCoroutine(SwingAnimation());
         Invoke(nameof(ResetAttack), attackDuration);
@@ -92,13 +113,4 @@ public class PlayerAttack : MonoBehaviour
         weaponCollider.enabled = false;
         isAttacking = false;
     }
-
-    /*private void OnTriggerEnter(Collider other)
-    {
-        if (isAttacking && other.CompareTag("Enemy"))
-        {
-            // 傳遞傷害（需要 enemy 有 EnemyCore.cs）
-            other.GetComponent<EnemyCore>()?.TakeDamage(20);
-        }
-    }*/
 }
