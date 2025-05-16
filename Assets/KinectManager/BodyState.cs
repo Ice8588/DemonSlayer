@@ -80,7 +80,7 @@ public class BodyState : MonoBehaviour
                             elbowRight
                         };  
 
-                        debugFunction(joints);
+                        //debugFunction(joints);
 
                         // Detect the body direction
                         DetectCatch(hadnLeft, hadnRight, elbowLeft, elbowRight);
