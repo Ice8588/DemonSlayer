@@ -79,14 +79,19 @@ public class PlayerCtrlAPI : MonoBehaviour
     void CallPlayerWeaponRotation()
     {
         PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
+        float startAngle = playerAttack.GetWeaponAngle();
+        float endAngle = startAngle;
+        //Debug.Log(startAngle + "," + endAngle);
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            playerAttack.ChangeRotation(-1);
+            endAngle += 100f * Time.deltaTime;
+            playerAttack.RotateWeapon(startAngle, endAngle);
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            playerAttack.ChangeRotation(1);
+            endAngle -= 100f * Time.deltaTime;
+            playerAttack.RotateWeapon(startAngle, endAngle);
         }
     }
 
