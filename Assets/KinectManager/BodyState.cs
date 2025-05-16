@@ -12,11 +12,11 @@ public class BodyState : MonoBehaviour
     private bool _detectBodyDirection {get; set;} = false;
 
     // Body direction
-    private bool _isCatch = false;
-    private int _moveH {get; set;} = 0;
-    private int _moveV {get; set;} = 0;
-    private int _turn {get; set;} = 0;
-    private float _handDegree {get; set;} = 0;
+    public bool _isCatch {get; private set;} = false;
+    public int _moveH {get; private set;} = 0;
+    public int _moveV {get; private set;} = 0;
+    public int _turn {get; private set;} = 0;
+    public float _handDegree {get; private set;} = 0;
 
     void Start()
     {
@@ -34,15 +34,25 @@ public class BodyState : MonoBehaviour
         {
             Kinect.Body[] data = _BodyManager.GetData();
 
-            if (data != null)
+            if (_BodyManager.GetBodyCount() == 0 || data == null)
             {
+                _detectBodyDirection = false;
+                _isCatch = false;
+                _moveH = 0;
+                _moveV = 0;
+                _turn = 0;
+                _handDegree = 0;
+            }
+            else
+            {
+
                 foreach (Kinect.Body body in data)
                 {
                     if (body.IsTracked)
                     {
                         _detectBodyDirection = true;
                         // Get the joints
-                        JointModel chest =new JointModel(body.Joints[Kinect.JointType.SpineMid]);
+                        JointModel chest = new JointModel(body.Joints[Kinect.JointType.SpineMid]);
                         JointModel hadnLeft = new JointModel(body.Joints[Kinect.JointType.HandTipLeft]);
                         JointModel hadnRight = new JointModel(body.Joints[Kinect.JointType.HandTipRight]);
                         JointModel shoulderLeft = new JointModel(body.Joints[Kinect.JointType.ShoulderLeft]);
@@ -51,30 +61,24 @@ public class BodyState : MonoBehaviour
                         JointModel spineBase = new JointModel(body.Joints[Kinect.JointType.SpineBase]);
                         JointModel neck = new JointModel(body.Joints[Kinect.JointType.Neck]);
                         JointModel head = new JointModel(body.Joints[Kinect.JointType.Head]);
-                        
+
                         // Detect the body direction
+                        DetectCatch(hadnLeft, hadnRight);
                         DetectBodyDirection(head, neck, spineBase);
                         DetectHandDegree(chest, hadnLeft, hadnRight);
                         DetectTurn(shoulderLeft, shoulderMid, shoulderRight);
 
-                        debugFunction(chest, hadnLeft, hadnRight, shoulderLeft, shoulderMid, shoulderRight);
 
                         break;
                     }
                 }
             }
-            else{
-                _detectBodyDirection = false;
-            }
         }
+        
     }
 
-    void debugFunction(JointModel chest, JointModel hadnLeft, JointModel hadnRight, JointModel shoulderLeft, JointModel shoulderMid, JointModel shoulderRight)
+    void debugFunction()
     {
-        DetectCatch(hadnLeft, hadnRight);
-        DetectHandDegree(chest, hadnLeft, hadnRight);
-        DetectTurn(shoulderLeft, shoulderMid, shoulderRight);
-
         GameObject.Find("State").GetComponent<TextMesh>().text = "Hand Degree: " + _handDegree + "\n" +
         "Move H: " + _moveH + "\n" + "Move V: " + _moveV + "\n" +
         "Turn: " + _turn + "\n" + "Is Catch: " + _isCatch + "\n" +
@@ -90,7 +94,7 @@ public class BodyState : MonoBehaviour
     
     void DetectHandDegree(JointModel chest, JointModel handLeft, JointModel handRight)
     {
-        if(_isCatch) return;
+        if(!_isCatch) return;
 
         Vector2 handAverage = new Vector2(
         (handLeft.Position.x + handRight.Position.x) / 2,

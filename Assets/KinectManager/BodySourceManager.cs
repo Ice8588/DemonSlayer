@@ -12,6 +12,25 @@ public class BodySourceManager : MonoBehaviour
     {
         return _Data;
     }
+
+    public int GetBodyCount()
+    {
+        if (_Data == null)
+        {
+            return 0;
+        }
+        
+        int count = 0;
+        foreach (var body in _Data)
+        {
+            if (body.IsTracked)
+            {
+                count++;
+            }
+        }
+        
+        return count;
+    }
     
 
     void Start () 
