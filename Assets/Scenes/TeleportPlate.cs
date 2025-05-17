@@ -20,7 +20,7 @@ public class TeleportPlate : MonoBehaviour
         if (other.CompareTag(triggerTag))
         {
             other.transform.position = targetPosition;
-            Debug.Log($"Player ¶Ç°e¨ì {targetPosition}");
+            Debug.Log($"Player teleported to {targetPosition}");
         }
     }
 }
