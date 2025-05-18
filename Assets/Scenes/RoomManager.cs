@@ -23,7 +23,7 @@ public class RoomManager : MonoBehaviour
         {
             if (room.IsCleared())
             {
-                Debug.Log($"©Ð¶¡ {room.roomId} Cleared");
+                Debug.Log($"Room {room.roomId} Cleared");
                 room.RemoveWalls();
                 yield break;
             }

@@ -36,7 +36,7 @@ public class Room : MonoBehaviour
             }
         }
 
-        Debug.Log($"房間 {roomId} 初始敵人數量：{initialEnemies.Count}");
+        Debug.Log($"Room{roomId} Enemy Count: {initialEnemies.Count}");
     }
 
     public bool IsCleared()
