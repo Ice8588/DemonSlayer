@@ -30,6 +30,7 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
     public UnityEvent<float> onPlayerDamaged; // 玩家受傷時的事件，參數為傷害值
     public UnityEvent onAttackBlocked; // 攻擊被格擋時的事件
     public UnityEvent onWeakPointHit; // 弱點被擊中時的事件
+    public UnityEvent<DirectionType[]> onDirectionPatternUpdated; // 方向模式更新時的事件，傳遞當前的方向陣列
     #endregion
 
     #region Private Fields
@@ -77,6 +78,9 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
         ResetAllDirections();
         GenerateAttackPoint();
         GenerateWeakPoints();
+        
+        // 觸發方向模式更新事件
+        onDirectionPatternUpdated?.Invoke(directions);
     }
 
     private void ResetAllDirections()
