@@ -5,10 +5,11 @@ using UnityEngine.EventSystems;
 public enum HintType
 {
     Red,
-    Yellow
+    Yellow,
+    None
 }
 
-public class QuadrantHint : MonoBehaviour, IPointerClickHandler
+public class QuadrantHint : MonoBehaviour
 {
     public HintType hintType = HintType.Red;
 
