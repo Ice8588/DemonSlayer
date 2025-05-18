@@ -21,15 +21,15 @@ public enum DirectionIndex
     UpLeft = 7
 }
 
-public interface IDirectionProvider
-{
-    // Get single direction type
-    public DirectionType GetDirectionType(int directionIndex);
+// public interface IDirectionProvider
+// {
+//     // Get single direction type
+//     public DirectionType GetDirectionType(int directionIndex);
     
-    // Get all direction types at once
-    public DirectionType[] GetAllDirectionTypes();
+//     // Get all direction types at once
+//     public DirectionType[] GetAllDirectionTypes();
 
-    // Interact with a specific direction
-    // Returns true if the interaction was successful
-    public bool InteractWithDirection(int directionIndex);
-}
+//     // Interact with a specific direction
+//     // Returns true if the interaction was successful
+//     public bool InteractWithDirection(int directionIndex);
+// }

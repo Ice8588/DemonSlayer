@@ -112,17 +112,11 @@ public class Enemy : MonoBehaviour
         return transform.position;
     }
 
-    /// <summary>
-    /// 由 EnemyAttack 調用，當敵人的弱點被擊中時。
-    /// </summary>
     public void RegisterWeakPointHit()
     {
         TakeDamage(weakPointReceivedDamage);
     }
 
-    /// <summary>
-    /// 外部系統（例如玩家的攻擊腳本）應調用此方法與敵人的方向系統交互。
-    /// </summary>
     public bool InteractWithDirection(int directionIndex)
     {
         if (attackController != null)
@@ -130,27 +124,6 @@ public class Enemy : MonoBehaviour
             return attackController.InteractWithDirection(directionIndex);
         }
         return false;
-    }
-
-    /// <summary>
-    /// 獲取方向類型，主要供GUI或其他需要顯示敵人狀態的系統使用。
-    /// </summary>
-    public DirectionType GetDirectionType(int directionIndex)
-    {
-        if (attackController != null)
-        {
-            return attackController.GetDirectionType(directionIndex);
-        }
-        return DirectionType.None;
-    }
-
-    public DirectionType[] GetAllDirectionTypes()
-    {
-        if (attackController != null)
-        {
-            return attackController.GetAllDirectionTypes();
-        }
-        return new DirectionType[8]; // 返回空數組或默認值
     }
     #endregion
 }
