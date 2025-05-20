@@ -2,11 +2,28 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EnemyAttack : MonoBehaviour, IDirectionProvider
+public class EnemyAttack : MonoBehaviour
 {
     #region Dependencies
     private Enemy enemyStats;
     private EnemyMovement movementController;
+    #endregion
+    
+    #region UI References
+    [Header("UI References")]
+    [SerializeField]
+    private GameObject attackUIObject; // 攻擊指示 UI 物件
+    
+    [Header("UI Settings")]
+    [SerializeField]
+    private float uiShowDistance = 5f; // 顯示 UI 的距離閾值
+    [SerializeField]
+    private Vector3 uiOffset = new Vector3(0, 2.0f, 0); // UI 相對於敵人的位置偏移
+    [SerializeField]
+    private Transform playerTransform; // 玩家的 Transform
+    
+    private bool isUIActive = false; // 追蹤 UI 是否顯示中
+    private QuadrantHintSpawner quadrantHintSpawner; // 用於更新攻擊UI
     #endregion
 
     #region Attack Settings
@@ -21,7 +38,7 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
     private float attackDamage = 20f;
 
     [SerializeField]
-    private float attackDelay = 1.0f;
+    private float attackDelay = 3.0f;
     #endregion
 
     #region Events
@@ -55,11 +72,13 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
     private void Start()
     {
         InitializeAttackSystem();
+        InitializeUI();
     }
 
     private void Update()
     {
         UpdateAttackPatternTimer();
+        CheckDistanceAndUpdateUI();
     }
     #endregion
 
@@ -67,6 +86,82 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
     private void InitializeAttackSystem()
     {
         UpdateDirectionPattern();
+    }
+    
+    private void InitializeUI()
+    {
+        // 初始化時隱藏 UI
+        if (attackUIObject != null)
+        {
+            attackUIObject.SetActive(false);
+            isUIActive = false;
+            
+            // 獲取 QuadrantHintSpawner 組件
+            quadrantHintSpawner = attackUIObject.GetComponent<QuadrantHintSpawner>();
+            if (quadrantHintSpawner == null)
+            {
+                Debug.LogWarning("攻擊UI物件上沒有 QuadrantHintSpawner 組件", attackUIObject);
+            }
+        }
+        
+        // 如果沒有指定玩家 Transform，嘗試查找帶有 "Player" 標籤的物件
+        if (playerTransform == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                playerTransform = player.transform;
+            }
+            else
+            {
+                Debug.LogWarning("找不到玩家，請手動指定玩家 Transform", this);
+            }
+        }
+    }
+    #endregion
+    
+    #region UI Management
+    private void CheckDistanceAndUpdateUI()
+    {
+        if (playerTransform == null || attackUIObject == null) return;
+
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+        // 根據距離顯示或隱藏 UI
+        if (distanceToPlayer <= uiShowDistance)
+        {
+            if (!isUIActive)
+            {
+                ShowUI();
+            }
+            // 更新 UI 位置跟隨敵人
+            attackUIObject.transform.position = transform.position + uiOffset;
+        }
+        else
+        {
+            if (isUIActive)
+            {
+                HideUI();
+            }
+        }
+    }
+
+    private void ShowUI()
+    {
+        attackUIObject.SetActive(true);
+        isUIActive = true;
+        
+        // 更新 UI 上的方向類型顯示
+        if (quadrantHintSpawner != null)
+        {
+            quadrantHintSpawner.UpdateAttackUI(directions);
+        }
+    }
+
+    private void HideUI()
+    {
+        attackUIObject.SetActive(false);
+        isUIActive = false;
     }
     #endregion
 
@@ -77,6 +172,19 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
         ResetAllDirections();
         GenerateAttackPoint();
         GenerateWeakPoints();
+        
+        // 如果 UI 正在顯示，確保它也更新
+        if (isUIActive && attackUIObject != null)
+        {
+            // 更新 UI 位置
+            attackUIObject.transform.position = transform.position + uiOffset;
+            
+            // 更新 UI 顯示
+            if (quadrantHintSpawner != null)
+            {
+                quadrantHintSpawner.UpdateAttackUI(directions);
+            }
+        }
     }
 
     private void ResetAllDirections()
@@ -176,21 +284,7 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
     }
     #endregion
 
-    #region IDirectionProvider Implementation
-    public DirectionType GetDirectionType(int directionIndex)
-    {
-        if (directionIndex >= 0 && directionIndex < directions.Length)
-        {
-            return directions[directionIndex];
-        }
-        return DirectionType.None;
-    }
-
-    public DirectionType[] GetAllDirectionTypes()
-    {
-        return directions;
-    }
-
+    #region Interact With Direction Attack API
     public bool InteractWithDirection(int directionIndex)
     {
         if (directionIndex < 0 || directionIndex >= directions.Length)
@@ -206,12 +300,14 @@ public class EnemyAttack : MonoBehaviour, IDirectionProvider
                 if (isAttacking && directionIndex == currentAttackDirectionIndex)
                 {
                     HandleAttackBlocked();
+                    quadrantHintSpawner?.InteractWithDirection(directionIndex);
                     return true;
                 }
                 return false;
 
             case DirectionType.WeakPoint:
                 HandleWeakPointHit();
+                quadrantHintSpawner?.InteractWithDirection(directionIndex);
                 return true;
 
             default:
