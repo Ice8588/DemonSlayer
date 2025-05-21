@@ -1,25 +1,34 @@
+/*
+ * PlayerAttack.cs
+ * This script handles the player's attack mechanics, including weapon rotation and attack animations.
+ * It uses Unity's coroutine system to create smooth transitions for weapon swings and rotations.
+ * The script also manages the weapon's collider to detect hits during attacks.
+ * It is designed to be attached to the player character.
+ */
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public Transform weaponTransform;
-    public Collider weaponCollider;
+    public Transform weaponTransform; // Reference to the weapon's transform
+    public Collider weaponCollider;   // Reference to the weapon's collider
     //public Animator animator;
-    private float rotationSpeed = 180f;
-    private float attackDuration = 0.8f;
-    private bool isAttacking = false;
-    private bool isRotating = false;
+    private float attackDuration = 0.8f; // Duration of the attack
+    private bool isAttacking = false;    // Is the player currently attacking?
+    private bool isRotating = false;     // Is the weapon currently rotating?
 
     void Start()
     {
+        // Disable the weapon's collider at the start of the game
         weaponCollider.enabled = false;
+        // Reset the weapon's rotation to the default
         weaponTransform.rotation = Quaternion.Euler(0f, 0f, 0f);
     }
 
     void Update()
     {
+        // Uncomment to enable manual rotation and attack input
         /*
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
@@ -33,25 +42,29 @@ public class PlayerAttack : MonoBehaviour
         */
     }
 
+    // Rotates the weapon from startAngle to endAngle
     public void RotateWeapon(float startAngle, float endAngle)
     {
+        // Prevent multiple simultaneous rotations
         if (isRotating)
         {
             return;
         }
 
         isRotating = true;
-        StartCoroutine(SwingAnimation(startAngle, endAngle));
+        StartCoroutine(RotateAnimation(startAngle, endAngle));
         isRotating = false;
     }
 
-    private IEnumerator SwingAnimation(float startAngle, float endAngle)
+    // Coroutine for rotating the weapon smoothly between two angles
+    private IEnumerator RotateAnimation(float startAngle, float endAngle)
     {
         float elapsedTime = 0f;
-        float duration = 0.01f;
+        float duration = 0.01f; // Duration of the rotation
         Quaternion startRotation = Quaternion.Euler(0f, 0f, startAngle);
         Quaternion endRotation = Quaternion.Euler(0f, 0f, endAngle);
 
+        // Smoothly interpolate between start and end rotation
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
@@ -59,37 +72,44 @@ public class PlayerAttack : MonoBehaviour
             yield return null;
         }
 
+        // Ensure the final rotation is set
         weaponTransform.localRotation = endRotation;
     }
 
+    // Returns the current Z angle of the weapon in degrees
     public float GetWeaponAngle()
     {
         return weaponTransform.localEulerAngles.z;
     }
 
+    // Initiates the attack if not already attacking
     public void Attack()
     {
+        // Prevent overlapping attacks
         if (isAttacking)
         {
             return;
         }
 
         isAttacking = true;
-        //animator.SetTrigger("Attack");
 
+        // Start the swing animation coroutine
         StartCoroutine(SwingAnimation());
+        // Schedule attack reset after the attack duration
         Invoke(nameof(ResetAttack), attackDuration);
     }
 
+    // Coroutine for swinging the weapon
     IEnumerator SwingAnimation()
     {
-        int swingAngle = 120;
+        int swingAngle = 120; // The angle to swing the weapon
 
         Quaternion startRot = weaponTransform.localRotation;
         Quaternion swingRot = Quaternion.AngleAxis(swingAngle, Vector3.right);
         Quaternion targetRot = startRot * swingRot;
 
         float t = 0f;
+        // Swing forward
         while (t < 0.3f)
         {
             t += Time.deltaTime;
@@ -98,6 +118,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         t = 0f;
+        // Swing back to original position
         while (t < 0.5f)
         {
             t += Time.deltaTime;
@@ -105,12 +126,16 @@ public class PlayerAttack : MonoBehaviour
             yield return null;
         }
 
+        // Ensure the weapon returns to its original rotation
         weaponTransform.localRotation = startRot;
     }
 
+    // Resets the attack state and disables the collider
     void ResetAttack()
     {
+        // Disable the weapon's collider after the attack
         weaponCollider.enabled = false;
+        // Allow new attacks
         isAttacking = false;
     }
 }
