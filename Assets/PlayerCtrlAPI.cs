@@ -15,13 +15,9 @@ public class PlayerCtrlAPI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CallPlayerCameraMove();
-        CallPlayerMove();
-
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-        {
-            CallPlayerWeaponRotation();
-        }
+        if (CallPlayerWeaponRotation()) return;
+        if (CallPlayerCameraMove()) return;
+        if (CallPlayerMove()) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
         {
@@ -29,70 +25,59 @@ public class PlayerCtrlAPI : MonoBehaviour
         }
     }
 
-    void CallPlayerCameraMove()
+    bool CallPlayerCameraMove()
     {
+        bool isCameraMove = false;
         PlayerCtrl playerCtrl = player.GetComponent<PlayerCtrl>();
+        BodyState bodyState = GameObject.Find("BodyState").GetComponent<BodyState>();
 
-        if (Input.GetKey(KeyCode.RightArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+        if ((bodyState._turn == 1 || bodyState._turn == -1))
         {
-            playerCtrl.CameraMoveX(1);
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-        {
-            playerCtrl.CameraMoveX(-1);
+            isCameraMove = true;
+            playerCtrl.CameraMoveX(bodyState._turn);
         }
 
-        if (Input.GetKey(KeyCode.UpArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-        {
-            playerCtrl.CameraMoveY(1);
-        }
-        else if (Input.GetKey(KeyCode.DownArrow) && !(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
-        {
-            playerCtrl.CameraMoveY(-1);
-        }
+        return isCameraMove;
     }
 
 
-    void CallPlayerMove()
+    bool CallPlayerMove()
     {
+        bool isPlayerMove = false;
         PlayerCtrl playerCtrl = player.GetComponent<PlayerCtrl>();
+        BodyState bodyState = GameObject.Find("BodyState").GetComponent<BodyState>();
 
-        if (Input.GetKey(KeyCode.W))
+        if (bodyState._moveV == 1 || bodyState._moveV == -1)
         {
-            playerCtrl.PlayerMoveV(1);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            playerCtrl.PlayerMoveV(-1);
+            isPlayerMove = true;
+            playerCtrl.PlayerMoveV(bodyState._moveV);
         }
 
-        if (Input.GetKey(KeyCode.A))
+        if (bodyState._moveH == 1 || bodyState._moveH == -1)
         {
-            playerCtrl.PlayerMoveH(-1);
+            isPlayerMove = true;
+            playerCtrl.PlayerMoveH(bodyState._moveH);
         }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            playerCtrl.PlayerMoveH(1);
-        }
+        
+        return isPlayerMove;
     }
 
-    void CallPlayerWeaponRotation()
+    bool CallPlayerWeaponRotation()
     {
+        bool isPlayerWeaponRotation = false;
+        BodyState bodyState = GameObject.Find("BodyState").GetComponent<BodyState>();
         PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
         float startAngle = playerAttack.GetWeaponAngle();
-        float endAngle = startAngle;
+        float endAngle = bodyState._handDegree;
         //Debug.Log(startAngle + "," + endAngle);
 
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (bodyState._isCatch)
         {
-            endAngle += 100f * Time.deltaTime;
             playerAttack.RotateWeapon(startAngle, endAngle);
+            isPlayerWeaponRotation = true;
         }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            endAngle -= 100f * Time.deltaTime;
-            playerAttack.RotateWeapon(startAngle, endAngle);
-        }
+
+        return isPlayerWeaponRotation;
     }
 
     void CallPlayerAttack()
