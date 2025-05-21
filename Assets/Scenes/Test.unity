@@ -508,6 +508,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1205105283867804732, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2263858456333717440, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2263858456333717440, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2263858456333717440, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 59fcbb3a6c604254abcb56ca4a891406, type: 2}
+    - target: {fileID: 2501417340206361543, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 2501417340206361543, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 3396929163789104795, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -551,6 +575,22 @@ PrefabInstance:
     - target: {fileID: 5880741391310391442, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7275566099688087994, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8330187428369859684, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8330187428369859684, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8429910815123112980, guid: 542246b87c1b46840a041b77ae62098e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
