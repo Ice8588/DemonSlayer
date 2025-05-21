@@ -46,10 +46,22 @@ public class PlayerAttack : MonoBehaviour
     public void RotateWeapon(float startAngle, float endAngle)
     {
         // Prevent multiple simultaneous rotations
-        if (isRotating)
+        int startBlock = Mathf.FloorToInt(startAngle / 45f);
+        int endBlock = Mathf.FloorToInt(endAngle / 45f);
+
+        if (IsCorresponding(startBlock, endBlock))
         {
-            return;
+            Attack(startBlock);
         }
+        else
+        {
+            if (!isRotating)
+            {
+                StartCoroutine(RotateAnimation(startAngle, endAngle));
+            }
+        }
+
+
 
         isRotating = true;
         StartCoroutine(RotateAnimation(startAngle, endAngle));
@@ -83,20 +95,12 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // Initiates the attack if not already attacking
-    public void Attack()
+    public void Attack(int block)
     {
-        // Prevent overlapping attacks
-        if (isAttacking)
-        {
-            return;
-        }
-
         isAttacking = true;
 
         // Start the swing animation coroutine
         StartCoroutine(SwingAnimation());
-        // Schedule attack reset after the attack duration
-        Invoke(nameof(ResetAttack), attackDuration);
     }
 
     // Coroutine for swinging the weapon
@@ -128,14 +132,26 @@ public class PlayerAttack : MonoBehaviour
 
         // Ensure the weapon returns to its original rotation
         weaponTransform.localRotation = startRot;
-    }
 
-    // Resets the attack state and disables the collider
-    void ResetAttack()
-    {
-        // Disable the weapon's collider after the attack
-        weaponCollider.enabled = false;
+        // Need animation
+        weaponTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        
         // Allow new attacks
         isAttacking = false;
+    }
+
+    private bool IsCorresponding(int blockA, int blockB)
+    {
+        //Debug.Log("blockA: " + blockA + ", blockB: " + blockB);
+        for (int offset = 3; offset <= 5; offset++)
+        {
+            int target = ((blockA + offset - 1) % 8) + 1;
+            if (blockB == target)
+            {
+                //Debug.Log("Corresponding: " + blockA + " -> " + blockB);
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -10,6 +10,8 @@ public class PlayerCtrl : MonoBehaviour
     public Transform playerCamera;
     private CharacterController controller;
     private float cameraPitch = 0f;
+    public float gravity = -9.81f;
+    public float verticalVelocity = 0f;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -18,12 +20,19 @@ public class PlayerCtrl : MonoBehaviour
 
     void Update()
     {
-        /*
-        CameraMoveX();
-        CameraMoveY();
-        PlayerMoveH();
-        PlayerMoveV();
-        */
+        if (controller.isGrounded && verticalVelocity < 0)
+        {
+            // 重設垂直速度以避免累加到地底下
+            verticalVelocity = -2f; // 小負值防止貼地浮空
+        }
+        else
+        {
+            // 套用重力
+            verticalVelocity += gravity * Time.deltaTime;
+        }
+
+        Vector3 move = new Vector3(0, verticalVelocity, 0);
+        controller.Move(move * Time.deltaTime);
     }
 
     public void CameraMoveX(int direction = 0) //-1 = left, 0 = none, 1 = right

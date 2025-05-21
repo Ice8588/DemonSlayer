@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCtrlTest : MonoBehaviour
@@ -13,7 +14,7 @@ public class PlayerCtrlTest : MonoBehaviour
     }
 
     // Update is called once per frame
- void Update()
+    void Update()
     {
         CallPlayerCameraMove();
         CallPlayerMove();
@@ -23,9 +24,17 @@ public class PlayerCtrlTest : MonoBehaviour
             CallPlayerWeaponRotation();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            CallPlayerAttack();
+            PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
+            float startAngle = playerAttack.GetWeaponAngle();
+            float endAngle = startAngle + 180f;
+            if (endAngle > 360f)
+            {
+                endAngle -= 360f;
+            }
+
+            playerAttack.RotateWeapon(startAngle, endAngle);
         }
     }
 
@@ -93,11 +102,5 @@ public class PlayerCtrlTest : MonoBehaviour
             endAngle -= 100f * Time.deltaTime;
             playerAttack.RotateWeapon(startAngle, endAngle);
         }
-    }
-
-    void CallPlayerAttack()
-    {
-        PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
-        playerAttack.Attack();
     }
 }
