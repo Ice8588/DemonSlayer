@@ -18,11 +18,6 @@ public class PlayerCtrlAPI : MonoBehaviour
         if (CallPlayerWeaponRotation()) return;
         if (CallPlayerCameraMove()) return;
         if (CallPlayerMove()) return;
-
-        if (Input.GetKeyDown(KeyCode.Alpha0) || Input.GetKeyDown(KeyCode.Keypad0))
-        {
-            CallPlayerAttack();
-        }
     }
 
     bool CallPlayerCameraMove()
@@ -58,7 +53,7 @@ public class PlayerCtrlAPI : MonoBehaviour
             isPlayerMove = true;
             playerCtrl.PlayerMoveH(bodyState._moveH);
         }
-        
+
         return isPlayerMove;
     }
 
@@ -80,9 +75,4 @@ public class PlayerCtrlAPI : MonoBehaviour
         return isPlayerWeaponRotation;
     }
 
-    void CallPlayerAttack()
-    {
-        PlayerAttack playerAttack = player.GetComponent<PlayerAttack>();
-        playerAttack.Attack();
-    }
 }
