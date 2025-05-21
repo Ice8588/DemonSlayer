@@ -18,12 +18,17 @@ public class PlayerAttack : MonoBehaviour
     private bool isAttacking = false;    // Is the player currently attacking?
     private bool isRotating = false;     // Is the weapon currently rotating?
 
+    public AudioClip swingSFX;
+    private AudioSource audioSource;
+
     void Start()
     {
         // Disable the weapon's collider at the start of the game
         weaponCollider.enabled = false;
         // Reset the weapon's rotation to the default
         weaponTransform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
+        audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Update()
@@ -106,6 +111,11 @@ public class PlayerAttack : MonoBehaviour
     // Coroutine for swinging the weapon
     IEnumerator SwingAnimation()
     {
+        if (swingSFX != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(swingSFX);
+        }
+
         int swingAngle = 120; // The angle to swing the weapon
 
         Quaternion startRot = weaponTransform.localRotation;
