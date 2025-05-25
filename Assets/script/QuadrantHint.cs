@@ -74,19 +74,20 @@ public class QuadrantHint : MonoBehaviour, IPointerClickHandler
                 timer = 0f;
             }
         }
-        else if (stage == 1) // 可互動並消失階段
+        else if (stage == 1) // 可互動並閃爍階段
         {
             if (timer < disappearTime)
             {
-                float t = timer / disappearTime;
-                rectTransform.localScale = Vector3.Lerp(Vector3.one * normalScale, Vector3.one * disappearScale, t);
-                SetAlpha(Mathf.Lerp(1f, 0.3f, t));
+                float alpha = Mathf.Lerp(0.3f, 1f, Mathf.PingPong(timer * 3f, 1f)); // 閃爍頻率 *4 可調整
+                SetAlpha(alpha);
+                rectTransform.localScale = Vector3.one * normalScale; // 維持固定大小
             }
             else
             {
                 gameObject.SetActive(false);
             }
         }
+
     }
 
     void SetAlpha(float a)
