@@ -70,3 +70,5 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+# Demo 影片原始檔（透過 GitHub 附件與 YouTube 提供，不納入版控）
+/DemonSlayer_DEMO.mp4
