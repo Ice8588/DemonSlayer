@@ -11,9 +11,9 @@
 
 ## ▶ 遊玩示範
 
-[![Demon Slayer 遊玩示範影片](https://img.youtube.com/vi/GHl9-KnaAF8/maxresdefault.jpg)](https://www.youtube.com/watch?v=GHl9-KnaAF8)
+https://github.com/user-attachments/assets/8a277fe1-35d6-48a9-b07d-48a4eeaebd25
 
-<sup>點擊圖片觀看完整遊玩示範</sup>
+<sup>亦可於 [YouTube](https://www.youtube.com/watch?v=GHl9-KnaAF8) 觀看</sup>
 
 ---
 
